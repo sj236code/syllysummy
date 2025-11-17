@@ -1,4 +1,4 @@
-// src/components/SummaryView.jsx
+// frontend/src/components/SummaryView.jsx
 import {
   BarChart,
   Bar,
@@ -14,6 +14,7 @@ export default function SummaryView({ parsed }) {
   const textbooks = parsed?.textbooks || [];
   const howToGetA = parsed?.how_to_get_A || "";
   const workload = parsed?.weekly_workload || [];
+  const policies = parsed?.policies || [];
 
   return (
     <div className="mt-6 space-y-6">
@@ -78,6 +79,26 @@ export default function SummaryView({ parsed }) {
         <p className="text-sm text-gray-700 leading-relaxed">
           {howToGetA}
         </p>
+      </section>
+
+      {/* Key Policies (AI extracted) */}
+      <section className="border border-gray-200 rounded-xl p-4 bg-white">
+        <h3 className="font-semibold text-gray-800 mb-2">
+          Key policies (AI extracted)
+        </h3>
+        {policies.length > 0 ? (
+          <ul className="list-disc ml-6 space-y-1">
+            {policies.map((p, i) => (
+              <li key={i} className="text-sm text-gray-700">
+                {p}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-gray-500">
+            No policies detected.
+          </p>
+        )}
       </section>
 
       {/* Weekly workload */}
