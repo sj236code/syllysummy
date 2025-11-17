@@ -1,15 +1,31 @@
-Course: STAT 201
+COURSE: PSY 101 – Introduction to Psychology
+Professor: Dr. Lauren Richards
+Semester: Spring 2025
 
-Grading:
-Homework – 20%
-Midterm Exam – 30%
-Final Exam – 40%
-Participation – 10%
+Course Description:
+This course introduces the scientific study of human behavior and mental processes. Topics include biological bases of behavior, cognition, learning, personality, and psychological disorders.
 
 Required Textbook:
-Intro to Statistics, 4th Edition, by Smith and Lee
+Psychology: Mind & Behavior, 6th Edition, by David Cohen
+Additional readings will be posted on Canvas.
 
-Important dates:
-Jan 15 – Homework 1 due
-02/10 – Midterm Exam
-April 25, 2025 – Final Exam
+Recommended Texts:
+Thinking, Fast and Slow by Daniel Kahneman
+
+Grading Breakdown:
+Homework – 15%
+Quizzes – 10%
+Midterm Exam – 25%
+Final Exam – 35%
+Participation – 15%
+
+Major Due Dates:
+Jan 28 – Homework 1 due
+February 10, 2025 – Quiz 1
+02/24 – Midterm Exam
+March 15 – Homework 2 due
+April 3, 2025 – Quiz 2
+04/22 – Final Exam
+
+How to Succeed:
+Attend lectures, complete all required readings before class, and study lecture notes weekly.

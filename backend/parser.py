@@ -1,10 +1,20 @@
 # backend/parser.py
 import re
+import os
+import json
 from datetime import datetime
 from typing import List, Dict, Any
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import pdfplumber
 from dateutil import parser as date_parser
+import requests
+
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+GEMINI_MODEL = "gemini-2.5-flash"  # AiStudio v1 REST
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1/models/{GEMINI_MODEL}:generateContent"
 
 
 # -----------------------------------------------------------------------------
@@ -32,7 +42,7 @@ def extract_text_from_file(path: str) -> str:
 
 
 # -----------------------------------------------------------------------------
-# Date / deadline extraction
+# Date / deadline extraction (heuristic)
 # -----------------------------------------------------------------------------
 def find_dates(text: str) -> List[Dict[str, Any]]:
     """
@@ -81,7 +91,7 @@ def find_dates(text: str) -> List[Dict[str, Any]]:
 
 
 # -----------------------------------------------------------------------------
-# Grading breakdown extraction
+# Grading breakdown extraction (heuristic)
 # -----------------------------------------------------------------------------
 def extract_grading_breakdown(text: str) -> List[Dict[str, Any]]:
     """
@@ -90,7 +100,6 @@ def extract_grading_breakdown(text: str) -> List[Dict[str, Any]]:
       - "Homework: 15%"
       - "Participation (10%)"
     """
-    # Try to zoom into a region around "grading" or similar
     m = re.search(
         r"(grading|grade breakdown|evaluation|assessment|course grade)[\s\S]{0,1200}",
         text,
@@ -105,16 +114,13 @@ def extract_grading_breakdown(text: str) -> List[Dict[str, Any]]:
         if not line:
             continue
 
-        # Look for percentages
         if re.search(r"\b\d{1,3}\s*%", line):
             p = re.search(r"(\d{1,3})\s*%", line)
             percent = int(p.group(1)) if p else None
 
-            # Remove the percent portion and cleanup
             name = re.sub(r"\d{1,3}\s*%", "", line)
             name = re.sub(r"[:\-]+", "", name).strip()
 
-            # Ignore obviously weird lines
             if not name and percent is None:
                 continue
 
@@ -126,7 +132,6 @@ def extract_grading_breakdown(text: str) -> List[Dict[str, Any]]:
                 }
             )
 
-    # Fallback: look for "Thing (20%)"
     if not items:
         for m in re.finditer(r"([A-Za-z0-9 \-]+?)\s*\((\d{1,3})\s*%\)", area):
             name = m.group(1).strip(" -:")
@@ -138,14 +143,11 @@ def extract_grading_breakdown(text: str) -> List[Dict[str, Any]]:
 
 
 # -----------------------------------------------------------------------------
-# Textbooks / readings extraction
+# Textbooks / readings extraction (heuristic)
 # -----------------------------------------------------------------------------
 def extract_textbooks(text: str) -> List[str]:
     """
     Grab a rough list of textbook / reading lines.
-
-    For the MVP we just return a flat list of lines that look like books;
-    later we can split into required vs optional sections.
     """
     m = re.search(
         r"(required texts?|textbooks?|required reading|books?)[\s\S]{0,500}",
@@ -162,12 +164,10 @@ def extract_textbooks(text: str) -> List[str]:
             if not line:
                 continue
 
-            # crude heuristic: long-ish lines or lines mentioning "by" or "edition"
             ll = line.lower()
             if len(line) > 30 or " by " in ll or "edition" in ll:
                 books.append(line)
 
-    # de-duplicate while preserving order
     seen = set()
     unique_books = []
     for b in books:
@@ -182,10 +182,6 @@ def extract_textbooks(text: str) -> List[str]:
 # "How to get an A" heuristic
 # -----------------------------------------------------------------------------
 def heuristic_how_to_get_an_A(parsed: Dict[str, Any]) -> str:
-    """
-    Uses the grading breakdown + presence of textbooks to give basic advice.
-    Can be replaced with an LLM later.
-    """
     tips = []
 
     grades = parsed.get("grading_breakdown", [])
@@ -223,13 +219,7 @@ def heuristic_how_to_get_an_A(parsed: Dict[str, Any]) -> str:
 # Weekly workload estimation
 # -----------------------------------------------------------------------------
 def predicted_weekly_workload(parsed: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """
-    Very rough: count how many deadlines fall in each calendar week.
-
-    Returns:
-      [{ "week": "2025-W02", "count": 3 }, ...]
-    """
-    weeks = {}
+    weeks: Dict[str, int] = {}
 
     for d in parsed.get("dates", []):
         iso = d.get("parsed")
@@ -250,19 +240,162 @@ def predicted_weekly_workload(parsed: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 
 # -----------------------------------------------------------------------------
-# Top-level parser
+# Heuristic parser (no AI) – fallback
 # -----------------------------------------------------------------------------
 def parse_syllabus(text: str) -> Dict[str, Any]:
-    """
-    Main function: given raw syllabus text, return the structured object
-    that the frontend will consume.
-    """
     parsed: Dict[str, Any] = {}
-
     parsed["dates"] = find_dates(text)
     parsed["grading_breakdown"] = extract_grading_breakdown(text)
     parsed["textbooks"] = extract_textbooks(text)
     parsed["how_to_get_A"] = heuristic_how_to_get_an_A(parsed)
+    parsed["weekly_workload"] = predicted_weekly_workload(parsed)
+    parsed["policies"] = []  # heuristic doesn't extract policies
+    return parsed
+
+
+# -----------------------------------------------------------------------------
+# Gemini AI parser via HTTP
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Gemini AI parser via HTTP
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Gemini AI parser via HTTP
+# -----------------------------------------------------------------------------
+def parse_syllabus_ai(text: str) -> Dict[str, Any]:
+    """
+    Uses Google Gemini (HTTP API) to parse ANY syllabus format into structured JSON.
+    Falls back to heuristic if key is missing or anything fails.
+    """
+    if not GEMINI_API_KEY:
+        return parse_syllabus(text)
+
+    prompt = """
+You are a highly accurate syllabus parser.
+Extract structured information from the following syllabus.
+
+Return ONLY valid JSON.
+No commentary. No markdown.
+
+JSON schema to follow exactly:
+
+{
+  "course_title": "string or null",
+  "instructor_name": "string or null",
+  "emails": ["string"],
+  "grading_breakdown": [
+    {
+      "name": "string",
+      "percent": 0,
+      "details": "string"
+    }
+  ],
+  "deadlines": [
+    {
+      "label": "string",
+      "date_iso": "YYYY-MM-DD or null",
+      "raw_line": "string"
+    }
+  ],
+  "textbooks_required": ["string"],
+  "textbooks_optional": ["string"],
+  "policies": ["string"],
+  "how_to_get_A": "string"
+}
+
+Be precise. Infer dates when written as ranges.
+Separate required vs optional textbooks.
+"""
+
+    body = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": prompt + "\n\nSYLLABUS:\n" + text
+                    }
+                ]
+            }
+        ]
+    }
+
+    try:
+        resp = requests.post(
+            GEMINI_URL,
+            params={"key": GEMINI_API_KEY},
+            json=body,
+            timeout=30,
+        )
+        resp_data = resp.json()
+
+        if resp.status_code != 200:
+            print("Gemini API error:", resp.status_code, resp_data)
+            return parse_syllabus(text)
+
+        # Extract the model's text (which SHOULD be JSON, but might be wrapped)
+        raw = resp_data["candidates"][0]["content"]["parts"][0].get("text", "")
+        raw_str = (raw or "").strip()
+
+        if not raw_str:
+            print("Gemini returned empty text, falling back to heuristic.")
+            return parse_syllabus(text)
+
+        # First try direct JSON
+        try:
+            data = json.loads(raw_str)
+        except json.JSONDecodeError:
+            # Try to extract the JSON object inside ``` or other noise
+            start = raw_str.find("{")
+            end = raw_str.rfind("}")
+            if start != -1 and end != -1 and start < end:
+                candidate = raw_str[start:end + 1]
+                try:
+                    data = json.loads(candidate)
+                except json.JSONDecodeError as e2:
+                    print("Failed to parse cleaned JSON candidate:", e2)
+                    return parse_syllabus(text)
+            else:
+                print("Could not locate JSON braces in Gemini output.")
+                return parse_syllabus(text)
+
+    except Exception as e:
+        print("Gemini HTTP call failed, using heuristic:", e)
+        return parse_syllabus(text)
+
+    # At this point we have a valid 'data' dict from Gemini
+    parsed: Dict[str, Any] = {}
+
+    parsed["grading_breakdown"] = [
+        {
+            "name": g.get("name"),
+            "percent": g.get("percent"),
+            "line": g.get("details") or "",
+        }
+        for g in data.get("grading_breakdown", [])
+    ]
+
+    parsed["dates"] = [
+        {
+            "raw": d.get("label"),
+            "line": d.get("raw_line"),
+            "parsed": d.get("date_iso"),
+        }
+        for d in data.get("deadlines", [])
+    ]
+
+    parsed["textbooks"] = (
+        data.get("textbooks_required", []) +
+        data.get("textbooks_optional", [])
+    )
+
+    how_to = data.get("how_to_get_A")
+    if isinstance(how_to, str):
+        parsed["how_to_get_A"] = how_to.strip()
+    else:
+        # fall back to heuristic if AI didn't give a string
+        parsed["how_to_get_A"] = heuristic_how_to_get_an_A(parsed)
+
+    parsed["policies"] = data.get("policies", [])
     parsed["weekly_workload"] = predicted_weekly_workload(parsed)
 
     return parsed
