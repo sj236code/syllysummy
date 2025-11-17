@@ -1,0 +1,93 @@
+
+Instructor: Dr. Itani
+Email:	itani@njit.edu
+Office:	GITC 4317C
+Office Hours:	
+M	10:00am–12:50pm
+R	10:00am–11:20am
+
+YWCC Tutoring Program
+The Ying Wu College of Computing at NJIT is committed to helping its students thrive and succeed academically. The YWCC tutoring program is a key part of that commitment. For more information, please visit undergraduate tutoringLinks to an external site..
+
+
+Course Description
+This course provides a comprehensive understanding of computer organization and architecture from a programmer’s perspective. It examines how internal hardware is structured to execute machine code instructions. Core programming concepts are explored, including variable assignments, control flow (branches and loops), arithmetic and logical operations, functions, and recursion. Assembly language is introduced to illustrate how a C compiler translates high-level C constructs into low-level instructions that closely reflect the operations performed by the CPU. Students work with a simplified CPU model based on the x86-64 architecture, studied in both sequential and pipelined forms. Additional topics include cache and main memory, virtual memory, and the translation of virtual addresses to physical addresses.
+
+
+Course Prerequisites
+A grade of "C" or better in CS280 (Programming Language Concepts)
+
+Mode of Instructional Delivery
+Unless otherwise dictated by NJIT, this course will be delivered in face-to-face mode.
+
+Respondus LockDown Browser and Respondus Monitor will be used to ensure the integrity of all exams, whether conducted online or face-to-face. Students are required to have a working laptop with at least 150 minute battery life, webcam, and microphone to take an exam. For more information, watch a brief introductory video that explains how LockDown Browser works from the student perspective: https://web.respondus.com/lockdownbrowser-student-video/Links to an external site..
+
+
+Grading Formula
+Midterm 1:                  28% of Total Grade    On Thursday 10/09/2025
+Midterm 2:                  36% of Total Grade    On Thursday 11/06/2025
+Final:                      36% of Total Grade    During Final Exams Period
+                                                  [12/14/2025-12/20/2025]
+Important: Class attendance is mandatory. Each absence will result in a drop of one full percentage grade.
+
+Letter grades will be assigned as follows:
+
+A  [80% to 100%)
+B+ [75% to  80%)
+B  [70% to  75%)
+C+ [65% to  70%)
+C  [55% to  65%)
+D  [45% to  55%)
+
+Grade Appeals
+If you believe you deserve more credit than what you have received for a specific part of a graded submission, you may request a regrade within 48 hours of the grade being posted. The regrading process will evaluate the entire submission, potentially resulting in points being added or subtracted.
+
+
+Required Textbook
+Bryant and O'Hallaron, Computer Systems: A Programmer's Perspective, 3rd Edition. Pearson 2016.
+ISBN: 978-0-13-409266-9 (Hardcover). Ensure you select the correct ISBN.
+
+
+Reference Textbook
+Kernighan and Ritchie, The C Programming Language, 2nd Edition. Prentice Hall 1988.
+ISBN: 0-13-110370-9 (Hardcover), or 0-13-110362-8 (Paperback).
+
+
+Course Outline
+A Tour of Computer Systems
+Representing and Manipulating Information
+Machine-Level Representation of Programs
+Processor Architecture
+The Memory Hierarchy
+Virtual Memory
+
+Course Policies
+Any student who does not meet the course prerequisites must drop the course immediately. Students who do not meet the prerequisite requirements will receive a failing grade regardless of their overall average in the course.
+The course content on Canvas, and course communication exchanged via Canvas, email, and during class time are copyrighted material. Sharing is prohibited. Each student must use their own NJIT account to access the material.
+Class attendance is mandatory and will be monitored. Each absence will result in a drop of one full percentage grade. A late arrival of 10 minutes or longer is equivalent to an absence, and late arrivals of lesser amounts will erode a student's grade to some degree.
+Assignment due dates are hard deadlines. Regardless of the circumstances, late submissions are not accepted.
+You must bring a valid government or university issued Photo ID to all exams.
+There are no make-up exams. Students who fail to take an exam will receive a score of zero. If you miss a midterm because of a documented special circumstance you may, at the instructor's discretion, receive an imputed grade based on the final exam.
+Electronic equipment must be turned off during class. During class time you may not play games, text, email, browse the web or engage in other activities that are not part of the class.
+Use of Generative AI, such as ChatGPT, is prohibited for any work affecting the overall course grade.
+
+NJIT Policy for Recording Classes
+Unauthorized student recordings of class sessions are prohibited and subject to sanctions as outlined by the NJIT Code of Student Conduct.
+
+http://www.njit.edu/dos/policies/conductcode/index.phpLinks to an external site.
+
+
+Religious Observances
+NJIT is committed to supporting students in observing religious holidays. Students must notify their instructor in writing of any conflicts between course requirements and religious observances by the end of the second week of classes. Reasonable accommodations will be provided for students who meet this deadline. This policy applies only to absences for religious observances.
+
+
+Statement on Academic Integrity
+Academic Integrity is the cornerstone of higher education and is central to the ideals of this course and the university. Cheating is strictly prohibited and devalues the degree that you are working on. As a member of the NJIT community, it is your responsibility to protect your educational investment by knowing and following the academic code of integrity policy that is found at:
+
+http://www.njit.edu/policies/sites/policies/files/academic-integrity-code.pdfLinks to an external site.
+
+It is my professional obligation and responsibility to report any academic misconduct to the Dean of Students Office. Any student found in violation of the code by cheating, plagiarizing or using any online site inappropriately will result in disciplinary action. This may include a failing grade of F, and/or suspension or dismissal from the university. If you have any questions about the code of Academic Integrity, please contact the Dean of Students Office at dos@njit.edu.
+
+
+
+You will be informed of any modifications of this syllabus during the semester.
