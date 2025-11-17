@@ -1,4 +1,3 @@
-// frontend/src/components/SummaryView.jsx
 import {
   BarChart,
   Bar,
@@ -17,7 +16,7 @@ export default function SummaryView({ parsed }) {
   const policies = parsed?.policies || [];
 
   return (
-    <div className="mt-6 space-y-6">
+    <div className="mt-2 space-y-6">
       <h2 className="text-lg font-semibold text-gray-800">
         Key Findings
       </h2>
